@@ -352,6 +352,7 @@ bool SHOW_TIME = true;
 bool SHOW_DATE = true;
 bool SHOW_WEATHER = true;
 bool SHOW_BAT = true;
+bool SHOW_BIGTIME = true;
 bool SHOW_TEMP = true;
 bool SHOW_HUM = true;
 bool SHOW_SECONDS = true;
@@ -453,3 +454,9 @@ int WEB_PORT = 80;
 OverlayEffect GLOBAL_OVERLAY = NONE;
 String HOSTNAME = "";
 bool BUZ_VOL = false;
+
+bool BIGTIME_BG_LOADED = false;
+bool BIGTIME_BG_ISGIF = false;
+File BIGTIME_BG_GIF;
+uint16_t BIGTIME_BG_BITMAP[256];
+uint8_t BIGTIME_BG_CURRENTFRAME = 0;

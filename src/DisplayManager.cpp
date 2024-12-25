@@ -1113,6 +1113,8 @@ void DisplayManager_::loadNativeApps()
   updateApp("Battery", BatApp, SHOW_BAT, 4);
 #endif
 
+  updateApp("BigTime", BigTimeApp, SHOW_BIGTIME, 5);
+
   ui->setApps(Apps);
   setAutoTransition(true);
 }
@@ -1548,6 +1550,10 @@ std::pair<String, AppCallback> getNativeAppByName(const String &appName)
     return std::make_pair("Battery", BatApp);
   }
 #endif
+  else if (appName == "BigTime")
+  {
+    return std::make_pair("BigTime", BigTimeApp);
+  }
   return std::make_pair("", nullptr);
 }
 
@@ -2055,6 +2061,7 @@ String DisplayManager_::getSettings()
   doc["HUM"] = SHOW_HUM;
   doc["TEMP"] = SHOW_TEMP;
   doc["BAT"] = SHOW_BAT;
+  doc["BIGTIME"] = SHOW_BIGTIME;
   doc["VOL"] = SOUND_VOLUME;
   doc["OVERLAY"] = getOverlayName();
   String jsonString;
@@ -2115,6 +2122,7 @@ void DisplayManager_::setNewSettings(const char *json)
   SHOW_HUM = doc.containsKey("HUM") ? doc["HUM"].as<bool>() : SHOW_HUM;
   SHOW_TEMP = doc.containsKey("TEMP") ? doc["TEMP"].as<bool>() : SHOW_TEMP;
   SHOW_BAT = doc.containsKey("BAT") ? doc["BAT"].as<bool>() : SHOW_BAT;
+  SHOW_BIGTIME = doc.containsKey("BIGTIME") ? doc["BIGTIME"].as<bool>() : SHOW_BIGTIME;
 
   if (doc.containsKey("VOL"))
   {

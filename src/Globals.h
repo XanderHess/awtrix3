@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <FastLED.h>
 #include "effects.h"
- 
+
 #define DEBUG
 
 #ifdef DEBUG
@@ -47,6 +47,7 @@ extern bool SHOW_TIME;
 extern bool SHOW_DATE;
 extern bool SHOW_WEATHER;
 extern bool SHOW_BAT;
+extern bool SHOW_BIGTIME;
 extern String HA_PREFIX;
 extern bool SHOW_TEMP;
 extern bool SHOW_HUM;
@@ -90,7 +91,7 @@ extern String TIME_FORMAT;
 extern String DATE_FORMAT;
 extern bool START_ON_MONDAY;
 extern bool IS_CELSIUS;
-  
+
 #define TEMP_SENSOR_TYPE_NONE 0
 #define TEMP_SENSOR_TYPE_BME280 1
 #define TEMP_SENSOR_TYPE_HTU21DF 2
@@ -135,7 +136,7 @@ extern bool MOODLIGHT_MODE;
 extern double movementFactor;
 extern uint8_t MIN_BRIGHTNESS;
 extern uint8_t MAX_BRIGHTNESS;
-extern float LDR_GAMMA; 
+extern float LDR_GAMMA;
 extern float LDR_FACTOR;
 extern bool DEBUG_MODE;
 extern String AUTH_USER;
@@ -148,4 +149,11 @@ extern OverlayEffect GLOBAL_OVERLAY;
 extern String HOSTNAME;
 extern int WEB_PORT;
 extern bool BUZ_VOL;
+
+extern bool BIGTIME_BG_LOADED;
+extern bool BIGTIME_BG_ISGIF;
+extern File BIGTIME_BG_GIF;
+extern uint16_t BIGTIME_BG_BITMAP[256];
+extern uint8_t BIGTIME_BG_CURRENTFRAME;
+
 #endif // Globals_H

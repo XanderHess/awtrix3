@@ -11,6 +11,7 @@
 #include "MQTTManager.h"
 #include "Overlays.h"
 #include "timer.h"
+#include "BigTime.h"
 
 uint16_t nativeAppsCount;
 
@@ -131,7 +132,7 @@ void TimeApp(FastLED_NeoMatrix *matrix, MatrixDisplayUiState *state, int16_t x, 
     {
         // week days on bottom line
         wdPosY = 7;
-        timePosY = 6 ;
+        timePosY = 6;
     }
 
     // time
@@ -299,11 +300,76 @@ void BatApp(FastLED_NeoMatrix *matrix, MatrixDisplayUiState *state, int16_t x, i
 }
 #endif
 
-String replacePlaceholders(String text) {
+void BigTimeApp(FastLED_NeoMatrix *matrix, MatrixDisplayUiState *state, int16_t x, int16_t y, GifPlayer *gifPlayer)
+{
+    if (notifyFlag)
+        return;
+    CURRENT_APP = "BigTime";
+    currentCustomApp = "";
+
+    if (!BIGTIME_BG_LOADED)
+    {
+        if (LittleFS.exists("/bigtime.gif"))
+        {
+            BIGTIME_BG_GIF = LittleFS.open("/bigtime.gif");
+            BIGTIME_BG_ISGIF = true;
+        }
+        else
+        {
+            for (int i = 0; i < 256; i++)
+            {
+                BIGTIME_BG_BITMAP[i] = 65535;
+            }
+        }
+        BIGTIME_BG_LOADED = true;
+    }
+
+    char t[20];
+    strftime(t, sizeof(t), "%H:%M", timer_localtime());
+
+    int16_t xx;
+
+    if (BIGTIME_BG_ISGIF)
+    {
+        gifPlayer->playGif(0, 0, &BIGTIME_BG_GIF, BIGTIME_BG_CURRENTFRAME);
+        BIGTIME_BG_CURRENTFRAME = gifPlayer->getFrame();
+    }
+    else
+    {
+        matrix->drawRGBBitmap(0, 0, BIGTIME_BG_BITMAP, 32, 8);
+    }
+
+    for (int i = 0; i < 5; i++)
+    {
+        xx = i * 7;
+        if (i == 2)
+        {
+            if (timer_time() % 2)
+            {
+                t[2] = ';';
+            }
+            xx--;
+        }
+        if (i > 2)
+        {
+            xx -= 2;
+        }
+        matrix->drawRGBBitmap(xx, 0, bigdigits[t[i] - '0'], bigdigits_mask_i[t[i] - '0'], 6, 7);
+    }
+
+    matrix->drawFastHLine(0, 7, 32, 0);
+    matrix->drawFastVLine(6, 0, 7, 0);
+    matrix->drawFastVLine(25, 0, 7, 0);
+}
+
+String replacePlaceholders(String text)
+{
     int start = 0;
-    while ((start = text.indexOf("{{", start)) != -1) {
+    while ((start = text.indexOf("{{", start)) != -1)
+    {
         int end = text.indexOf("}}", start);
-        if (end == -1) {
+        if (end == -1)
+        {
             break;
         }
         String placeholder = text.substring(start + 2, end);
@@ -370,20 +436,20 @@ void ShowCustomApp(String name, FastLED_NeoMatrix *matrix, MatrixDisplayUiState 
 
     bool hasIcon = ca->icon || ca->jpegDataSize > 0;
 
-uint16_t textWidth = 0;
-if (!ca->fragments.empty())
-{
-    for (const auto &fragment : ca->fragments)
+    uint16_t textWidth = 0;
+    if (!ca->fragments.empty())
     {
-        String replacedFragment = replacePlaceholders(fragment);
-        textWidth += getTextWidth(replacedFragment.c_str(), ca->textCase);
+        for (const auto &fragment : ca->fragments)
+        {
+            String replacedFragment = replacePlaceholders(fragment);
+            textWidth += getTextWidth(replacedFragment.c_str(), ca->textCase);
+        }
     }
-}
-else
-{
-    String replacedText = replacePlaceholders(ca->text);
-    textWidth = getTextWidth(replacedText.c_str(), ca->textCase);
-}
+    else
+    {
+        String replacedText = replacePlaceholders(ca->text);
+        textWidth = getTextWidth(replacedText.c_str(), ca->textCase);
+    }
 
     uint16_t availableWidth = (hasIcon) ? 24 : 32;
 
@@ -547,7 +613,7 @@ else
         textX = hasIcon ? 9 : 0;
     }
 
-    String text =replacePlaceholders(ca->text);
+    String text = replacePlaceholders(ca->text);
 
     if (noScrolling)
     {
@@ -558,7 +624,7 @@ else
             int16_t fragmentX = textX + ca->textOffset;
             for (size_t i = 0; i < ca->fragments.size(); ++i)
             {
-                String text =replacePlaceholders(ca->fragments[i]);
+                String text = replacePlaceholders(ca->fragments[i]);
                 DisplayManager.setTextColor(TextEffect(ca->colors[i], ca->fade, ca->blink));
                 DisplayManager.printText(x + fragmentX, y + 6, text.c_str(), false, ca->textCase);
                 fragmentX += getTextWidth(text.c_str(), ca->textCase);
@@ -566,7 +632,7 @@ else
         }
         else
         {
-            String text =replacePlaceholders(ca->text);
+            String text = replacePlaceholders(ca->text);
             if (ca->rainbow)
             {
                 DisplayManager.HSVtext(x + textX + ca->textOffset, 6 + y, text.c_str(), false, ca->textCase);
@@ -589,7 +655,7 @@ else
             int16_t fragmentX = ca->scrollposition + ca->textOffset;
             for (size_t i = 0; i < ca->fragments.size(); ++i)
             {
-                String text =replacePlaceholders(ca->fragments[i]);
+                String text = replacePlaceholders(ca->fragments[i]);
                 DisplayManager.setTextColor(TextEffect(ca->colors[i], ca->fade, ca->blink));
                 DisplayManager.printText(x + fragmentX, y + 6, text.c_str(), false, ca->textCase);
                 fragmentX += getTextWidth(text.c_str(), ca->textCase);
